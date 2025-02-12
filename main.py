@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
 load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:732Alshyn@localhost:5433/todo_db")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:5432@localhost:5433/todo_db")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
