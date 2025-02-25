@@ -124,7 +124,7 @@ function displayTasks(tasks) {
 
         const dueDateUTC = new Date(task.due_date);
 
-        const dueDateLocal = moment.utc(dueDateUTC).tz("Asia/Almaty").format("YYYY-MM-DD HH:mm:ss");
+        const dueDateLocal = moment.utc(dueDateUTC).tz("Asia/Yekaterinburg").format("YYYY-MM-DD HH:mm:ss");
 
         const now = new Date();
         const isOverdue = dueDateUTC < now;

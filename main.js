@@ -66,7 +66,7 @@ const sendReminder = async (task, userEmail) => {
         return;
     }
 
-    const localTime = moment.utc(task.due_date).tz("Asia/Almaty").format("YYYY-MM-DD HH:mm:ss");
+    const localTime = moment.utc(task.due_date).tz("Asia/Yekaterinburg").format("YYYY-MM-DD HH:mm:ss");
 
     const mailOptions = {
         from: EMAIL_USER,
@@ -143,7 +143,7 @@ app.post("/tasks", authenticate, async (req, res) => {
     try {
         let { title, description, due_date, priority, category } = req.body;
 
-        due_date = moment.tz(due_date, "Asia/Almaty").utc().toISOString();
+        due_date = moment.tz(due_date, "Asia/Yekaterinburg").utc().toISOString();
 
         const newTask = new Task({
             user: req.user.id,
