@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.40/moment-timezone-with-data.min.js"></script>
     <title>Task Manager</title>
     <style>
         body {
@@ -121,7 +123,7 @@ function displayTasks(tasks) {
         taskElement.classList.add("task");
 
         const dueDateUTC = new Date(task.due_date);
-        
+
         const dueDateLocal = moment.utc(dueDateUTC).tz("Asia/Almaty").format("YYYY-MM-DD HH:mm:ss");
 
         const now = new Date();
