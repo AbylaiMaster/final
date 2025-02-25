@@ -154,7 +154,17 @@ app.post("/tasks", authenticate, async (req, res) => {
             category
         });
 
+        
         await newTask.save();
+
+        const now = new Date();
+        const deadline = new Date(newTask.due_date);
+        const delay = 0.7 * (deadline.getTime() - now.getTime());
+
+        if (delay > 0) {
+            setTimeout(() => sendReminder(newTask, user.email), delay);
+        }
+
         res.status(201).json(newTask);
     } catch (error) {
         res.status(400).json({ error: error.message });
