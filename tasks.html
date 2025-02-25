@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+            width: 300px;
+        }
+        input, select, button {
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: darkblue;
+        }
+        .task {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 5px;
+            width: 300px;
+        }
+        .overdue {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h2>Task Manager</h2>
+
+    <button onclick="logout()">Logout</button>
+
+    <h3>Add New Task</h3>
+    <form id="taskForm">
+        <input type="text" id="title" placeholder="Title" required>
+        <input type="text" id="description" placeholder="Description">
+        <input type="datetime-local" id="due_date" required>
+        <select id="priority">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+        </select>
+        <input type="text" id="category" placeholder="Category">
+        <button type="submit">Add Task</button>
+    </form>
+
+    <h3>Filter Tasks</h3>
+    <select id="filter">
+        <option value="all">All</option>
+        <option value="day">Today</option>
+        <option value="week">This Week</option>
+        <option value="month">This Month</option>
+    </select>
+    <select id="priorityFilter">
+        <option value="all">All Priorities</option>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+    </select>
+
+    <div id="taskContainer"></div>
+
+    <script>
+        const API_URL = "https://final-zrye.onrender.com";
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            alert("You must log in first.");
+            window.location.href = "login.html";
+        }
+
+        async function fetchTasks() {
+            const period = document.getElementById("filter").value;
+            const priority = document.getElementById("priorityFilter").value;
+            let url = `${API_URL}/tasks`;
+
+            if (period !== "all") {
+                url = `${API_URL}/tasks/filter?period=${period}`;
+            }
+
+            const response = await fetch(url, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            let tasks = await response.json();
+
+            if (priority !== "all") {
+                tasks = tasks.filter(task => task.priority === priority);
+            }
+
+            displayTasks(tasks);
+        }
+
+        function displayTasks(tasks) {
+            const container = document.getElementById("taskContainer");
+            container.innerHTML = "";
+
+            tasks.forEach(task => {
+                const taskElement = document.createElement("div");
+                taskElement.classList.add("task");
+
+                const dueDate = new Date(task.due_date);
+                const now = new Date();
+                const isOverdue = dueDate < now;
+
+taskElement.innerHTML = `
+    <h3>${task.title}</h3>
+    <p>${task.description}</p>
+    <p><strong>Priority:</strong> ${task.priority}</p>
+    <p><strong>Category:</strong> ${task.category}</p>
+    <p class="${isOverdue ? "overdue" : ""}"><strong>Deadline:</strong> ${dueDate.toLocaleString()}</p>
+    <button onclick="editTask('${task._id}', '${task.title}', '${task.description}', '${task.due_date}', '${task.priority}', '${task.category}')">Edit</button>
+    <button onclick="deleteTask('${task._id}')">Delete</button>
+`;
+container.appendChild(taskElement);
+});
+}
+
+async function addTask(event) {
+event.preventDefault();
+const title = document.getElementById("title").value;
+const description = document.getElementById("description").value;
+const due_date = document.getElementById("due_date").value;
+const priority = document.getElementById("priority").value;
+const category = document.getElementById("category").value;
+
+const response = await fetch(`${API_URL}/tasks`, {
+method: "POST",
+headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`
+},
+body: JSON.stringify({ title, description, due_date, priority, category })
+});
+
+if (response.ok) {
+fetchTasks();
+} else {
+alert("Failed to add task.");
+}
+}
+
+async function editTask(id, title, description, due_date, priority, category) {
+const newTitle = prompt("Enter new title:", title);
+const newDescription = prompt("Enter new description:", description);
+const newDueDate = prompt("Enter new due date (YYYY-MM-DDTHH:MM):", due_date);
+const newPriority = prompt("Enter new priority (low, medium, high):", priority);
+const newCategory = prompt("Enter new category:", category);
+
+const response = await fetch(`${API_URL}/tasks/${id}`, {
+method: "PUT",
+headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`
+},
+body: JSON.stringify({ title: newTitle, description: newDescription, due_date: newDueDate, priority: newPriority, category: newCategory })
+});
+
+if (response.ok) {
+fetchTasks();
+} else {
+alert("Failed to update task.");
+}
+}
+
+async function deleteTask(id) {
+if (confirm("Are you sure you want to delete this task?")) {
+const response = await fetch(`${API_URL}/tasks/${id}`, {
+    method: "DELETE",
+    headers: { "Authorization": `Bearer ${token}` }
+});
+
+if (response.ok) {
+    fetchTasks();
+} else {
+    alert("Failed to delete task.");
+}
+}
+}
+
+function logout() {
+localStorage.removeItem("token");
+window.location.href = "login.html";
+}
+
+document.getElementById("taskForm").addEventListener("submit", addTask);
+document.getElementById("filter").addEventListener("change", fetchTasks);
+document.getElementById("priorityFilter").addEventListener("change", fetchTasks);
+fetchTasks();
+</script>
+</body>
+</html>
