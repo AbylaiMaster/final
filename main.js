@@ -9,10 +9,10 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://abylai102006:wKfB69Z9dcf0Ji2I@cluster0.7koen.mongodb.net/web_final?retryWrites=true&w=majority&appName=Cluster0";
-const EMAIL_USER = process.env.EMAIL_USER || "alshynkalyev@gmail.com";
-const EMAIL_PASS = process.env.EMAIL_PASS || "eyug jnwj wuyh rnll";
+const PORT = process.env.PORT;
+const MONGO_URI = process.env.MONGO_URI;
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
 
 mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
