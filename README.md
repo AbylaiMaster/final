@@ -1,1 +1,0 @@
-This project is a to-do list, that connects to FastAPI and PostgreSQL.
