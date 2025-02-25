@@ -143,7 +143,7 @@ app.post("/tasks", authenticate, async (req, res) => {
     try {
         let { title, description, due_date, priority, category } = req.body;
 
-        due_date = new Date(due_date).toISOString();
+        due_date = moment.tz(due_date, "Asia/Almaty").utc().toISOString();
 
         const newTask = new Task({
             user: req.user.id,
