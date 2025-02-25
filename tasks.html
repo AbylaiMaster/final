@@ -121,7 +121,6 @@ function displayTasks(tasks) {
         taskElement.classList.add("task");
 
         const dueDateUTC = new Date(task.due_date);
-        const dueDateLocal = new Date(dueDateUTC.toLocaleString("en-US", { timeZone: "Asia/Almaty" }));
 
         const now = new Date();
         const isOverdue = dueDateUTC < now;
@@ -131,7 +130,7 @@ function displayTasks(tasks) {
             <p>${task.description}</p>
             <p><strong>Priority:</strong> ${task.priority}</p>
             <p><strong>Category:</strong> ${task.category}</p>
-            <p class="${isOverdue ? "overdue" : ""}"><strong>Deadline:</strong> ${dueDateLocal.toLocaleString()}</p>
+            <p class="${isOverdue ? "overdue" : ""}"><strong>Deadline:</strong> ${dueDateUTC.toLocaleString()}</p>
             <button onclick="editTask('${task._id}', '${task.title}', '${task.description}', '${task.due_date}', '${task.priority}', '${task.category}')">Edit</button>
             <button onclick="deleteTask('${task._id}')">Delete</button>
         `;
