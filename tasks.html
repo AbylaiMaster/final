@@ -112,31 +112,32 @@
             displayTasks(tasks);
         }
 
-        function displayTasks(tasks) {
-            const container = document.getElementById("taskContainer");
-            container.innerHTML = "";
+function displayTasks(tasks) {
+    const container = document.getElementById("taskContainer");
+    container.innerHTML = "";
 
-            tasks.forEach(task => {
-                const taskElement = document.createElement("div");
-                taskElement.classList.add("task");
+    tasks.forEach(task => {
+        const taskElement = document.createElement("div");
+        taskElement.classList.add("task");
 
-                const dueDate = new Date(task.due_date);
-                const now = new Date();
-                const isOverdue = dueDate < now;
+        const dueDateUTC = new Date(task.due_date);
+        const dueDateLocal = new Date(dueDateUTC.toLocaleString("en-US", { timeZone: "Asia/Almaty" }));
 
-taskElement.innerHTML = `
-    <h3>${task.title}</h3>
-    <p>${task.description}</p>
-    <p><strong>Priority:</strong> ${task.priority}</p>
-    <p><strong>Category:</strong> ${task.category}</p>
-    <p class="${isOverdue ? "overdue" : ""}"><strong>Deadline:</strong> ${dueDate.toLocaleString()}</p>
-    <button onclick="editTask('${task._id}', '${task.title}', '${task.description}', '${task.due_date}', '${task.priority}', '${task.category}')">Edit</button>
-    <button onclick="deleteTask('${task._id}')">Delete</button>
-`;
-container.appendChild(taskElement);
-});
+        const now = new Date();
+        const isOverdue = dueDateUTC < now;
+
+        taskElement.innerHTML = `
+            <h3>${task.title}</h3>
+            <p>${task.description}</p>
+            <p><strong>Priority:</strong> ${task.priority}</p>
+            <p><strong>Category:</strong> ${task.category}</p>
+            <p class="${isOverdue ? "overdue" : ""}"><strong>Deadline:</strong> ${dueDateLocal.toLocaleString()}</p>
+            <button onclick="editTask('${task._id}', '${task.title}', '${task.description}', '${task.due_date}', '${task.priority}', '${task.category}')">Edit</button>
+            <button onclick="deleteTask('${task._id}')">Delete</button>
+        `;
+        container.appendChild(taskElement);
+    });
 }
-
 async function addTask(event) {
 event.preventDefault();
 const title = document.getElementById("title").value;

@@ -141,26 +141,20 @@ app.get("/tasks/filter", authenticate, async (req, res) => {
 
 app.post("/tasks", authenticate, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
-        if (!user) {
-            return res.status(400).json({ error: "User not found" });
-        }
+        let { title, description, due_date, priority, category } = req.body;
+
+        due_date = new Date(due_date).toISOString();
 
         const newTask = new Task({
-            ...req.body,
             user: req.user.id,
+            title,
+            description,
+            due_date,
+            priority,
+            category
         });
 
         await newTask.save();
-
-        const now = new Date();
-        const deadline = new Date(newTask.due_date);
-        const delay = 0.7 * (deadline.getTime() - now.getTime());
-
-        if (delay > 0) {
-            setTimeout(() => sendReminder(newTask, user.email), delay);
-        }
-
         res.status(201).json(newTask);
     } catch (error) {
         res.status(400).json({ error: error.message });
