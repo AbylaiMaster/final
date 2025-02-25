@@ -62,11 +62,13 @@ const authenticate = (req, res, next) => {
 
 const sendReminder = async (task, userEmail) => {
     if (!userEmail) {
-        console.error("No email found for the user, skipping email notification.");
+        console.error("❌ No email found for the user, skipping email notification.");
         return;
     }
 
     const localTime = moment.utc(task.due_date).tz("Asia/Yekaterinburg").format("YYYY-MM-DD HH:mm:ss");
+    
+    console.log(`📩 Sending email to ${userEmail} for task "${task.title}" with deadline ${localTime}`);
 
     const mailOptions = {
         from: EMAIL_USER,
@@ -141,6 +143,11 @@ app.get("/tasks/filter", authenticate, async (req, res) => {
 
 app.post("/tasks", authenticate, async (req, res) => {
     try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(400).json({ error: "User not found" });
+        }
+
         let { title, description, due_date, priority, category } = req.body;
 
         due_date = moment.tz(due_date, "Asia/Yekaterinburg").utc().toISOString();
@@ -154,12 +161,13 @@ app.post("/tasks", authenticate, async (req, res) => {
             category
         });
 
-        
         await newTask.save();
 
         const now = new Date();
         const deadline = new Date(newTask.due_date);
         const delay = 0.7 * (deadline.getTime() - now.getTime());
+
+        console.log(`🕒 Task created: "${title}" - Reminder in ${Math.round(delay / 1000 / 60)} minutes`);
 
         if (delay > 0) {
             setTimeout(() => sendReminder(newTask, user.email), delay);
